@@ -1,0 +1,20 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "description": "Angular application",
+  "keywords": [
+    "angular",
+    "grunt",
+    "bower"
+  ],
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "0.4.5",
+    "grunt-connect": "^0.2.0",
+    "grunt-contrib-concat": "0.5.1",
+    "grunt-contrib-copy": "0.8.2",
+    "grunt-contrib-requirejs": "^0.4.4",
+    "grunt-contrib-uglify": "0.11.0"
+  }
+}
