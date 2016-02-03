@@ -23,24 +23,21 @@ module.exports = function (grunt) {
           {src: ['config/main.js'], dest: 'public/assets/main.js'},
 
           {expand: true, src: ['app/**'], dest: 'public/assets/'},
+          {src: ['bower_components/requirejs/require.js'], dest: 'public/assets/require.js'},
           {src: ['bower_components/text/text.js'], dest: 'public/assets/require-text.js'}
         ],
       },
 
       dev: {
         files: [
-          {expand: true, cwd: 'bower_components/bootstrap/dist/fonts', src: ['**'], dest: 'public/assets'},
-
-          {src: ['bower_components/requirejs/require.js'], dest: 'public/assets/require.js'}
+          {expand: true, cwd: 'bower_components/bootstrap/dist/fonts', src: ['**'], dest: 'public/assets'}
         ]
       },
 
       prod: {
         files: [
           {src: ['public/index.html'], dest: 'dist/index.html'},
-          {expand: true, cwd: 'bower_components/bootstrap/dist/fonts', src: ['**'], dest: 'dist/assets'},
-
-          {src: ['bower_components/requirejs/require.js'], dest: 'dist/assets/require.js'}
+          {expand: true, cwd: 'bower_components/bootstrap/dist/fonts', src: ['**'], dest: 'dist/assets'}
         ]
       }
     },
