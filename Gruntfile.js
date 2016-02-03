@@ -3,7 +3,7 @@ module.exports = function (grunt) {
     pkg: grunt.file.readJSON('package.json'),
 
     clean: {
-      dev: ['public/assets/js', 'public/*.js', 'public/index.html']
+      dev: ['public', 'dist', 'tmp']
     },
 
     copy: {
@@ -17,7 +17,9 @@ module.exports = function (grunt) {
           {expand: true, src: ['app/**'], dest: 'public/assets/js/'},
 
           {src: ['bower_components/requirejs/require.js'], dest: 'public/assets/js/require.js'},
-          {src: ['bower_components/text/text.js'], dest: 'public/assets/js/require-text.js'}
+          {src: ['bower_components/text/text.js'], dest: 'public/assets/js/require-text.js'},
+
+          {expand: true, src: ['bower_components/bootstrap/dist/fonts/**'], dest: 'public/assets/fonts/'}
         ]
       }
     },
@@ -33,13 +35,30 @@ module.exports = function (grunt) {
       options: {
         separator: ';'
       },
-      dist: {
+      js: {
         src: [
           'bower_components/jquery/dist/jquery.js',
           'bower_components/angular/angular.js',
-          'bower_components/angular-route/angular-route.js'
+          'bower_components/angular-route/angular-route.js',
+          'bower_components/angular-bootstrap/ui-bootstrap-tpls.js'
         ],
-        dest: 'public/vendor.js'
+        dest: 'public/assets/js/vendor.js'
+      },
+      css: {
+        src: [
+          'bower_components/bootstrap/dist/css/bootstrap.css'
+        ],
+        dest: 'public/assets/css/vendor.css'
+      }
+    },
+
+    compass: {
+      dist: {
+        options: {
+          sassDir: 'app/styles',
+          cssDir: 'public/assets/css',
+          environment: 'development'
+        }
       }
     },
 
@@ -49,7 +68,7 @@ module.exports = function (grunt) {
         livereload: true
       },
       src: {
-        files: ['app/index.html', 'app/**/*.js', 'config/*.js'],
+        files: ['app/index.html', 'config/*.js', 'app/**/*.{js|html}', 'app/styles/**/*.scss'],
         tasks: ['build_dev']
       },
     },
@@ -69,10 +88,11 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-compass');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-connect');
 
-  grunt.registerTask('build_dev', ['clean:dev', 'copy', 'concat']);
+  grunt.registerTask('build_dev', ['clean:dev', 'copy', 'concat', 'compass']);
 
   grunt.registerTask('build', []);
 
