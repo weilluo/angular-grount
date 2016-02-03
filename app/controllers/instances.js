@@ -1,4 +1,4 @@
-define(['angular'], function(angular) {
+define([], function() {
   return [
     '$scope',
     function($scope) {

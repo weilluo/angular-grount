@@ -2,10 +2,22 @@ module.exports = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
+    clean: {
+      dev: ['public/assets/js', 'public/*.js', 'public/index.html']
+    },
+
     copy: {
       main: {
         files: [
-          {src: ['app/index.html'], dest: 'public/index.html'}
+          {src: ['app/index.html'], dest: 'public/index.html'},
+
+          {src: ['config/config.js'], dest: 'public/assets/js/config.js'},
+          {src: ['config/main.js'], dest: 'public/assets/js/main.js'},
+
+          {expand: true, src: ['app/**'], dest: 'public/assets/js/'},
+
+          {src: ['bower_components/requirejs/require.js'], dest: 'public/assets/js/require.js'},
+          {src: ['bower_components/text/text.js'], dest: 'public/assets/js/require-text.js'}
         ]
       }
     },
@@ -23,46 +35,32 @@ module.exports = function (grunt) {
       },
       dist: {
         src: [
-          'bower_components/requirejs/require.js',
-          'bower_components/jquery/dist/jquery.js'
+          'bower_components/jquery/dist/jquery.js',
+          'bower_components/angular/angular.js',
+          'bower_components/angular-route/angular-route.js'
         ],
         dest: 'public/vendor.js'
       }
     },
 
-    requirejs: {
-      compile: {
-        options: {
-          baseUrl: './',
-
-          paths: {
-            text: 'bower_components/text/text',
-
-            angular: 'bower_components/angular/angular',
-            'angular-route': 'bower_components/angular-route/angular-route',
-            'angular-deferred-bootstrap': 'bower_components/angular-deferred-bootstrap/angular-deferred-bootstrap'
-          },
-
-          shim: {
-            'angular-route': ['angular'],
-            'angular-deferred-bootstrap': ['angular']
-          },
-
-          include: [
-            'app/app'
-          ],
-
-          optimize: 'none',
-
-          out: 'public/app.js'
-        }
-      }
+    watch: {
+      options: {
+        spawn: true,
+        livereload: true
+      },
+      src: {
+        files: ['app/index.html', 'app/**/*.js', 'config/*.js'],
+        tasks: ['build_dev']
+      },
     },
 
     connect: {
-      dev: {
-        port: 4200,
-        base: 'public'
+      server: {
+        options: {
+          livereload: true,
+          port: 8000,
+          base: 'public'
+        }
       }
     }
   });
@@ -70,10 +68,13 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-requirejs');
-  grunt.loadNpmTasks('grunt-connect');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-connect');
 
-  grunt.registerTask('build', ['copy', 'concat', 'uglify', 'requirejs']);
+  grunt.registerTask('build_dev', ['clean:dev', 'copy', 'concat']);
 
-  grunt.registerTask('server', ['connect:dev']);
+  grunt.registerTask('build', []);
+
+  grunt.registerTask('server', ['build_dev', 'connect:server', 'watch']);
 };

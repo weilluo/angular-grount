@@ -1,17 +1,19 @@
-define(['angular-route'], function() {
+define([
+    'text!app/templates/instances.html',
+    'text!app/templates/instance.html'
+  ],
+  function(instancesTemplate, instanceTemplate) {
   return [
     '$routeProvider',
     function($routeProvider) {
       $routeProvider.
-        when('/', {redirectTo: '/instances'}).
-
-        when('/instances', {
-          templateUrl: 'app/templates/instances.html',
+        when('/', {
+          template: instancesTemplate,
           controller: 'InstancesCtrl'
         }).
 
         when('/instances/:hostname', {
-          templateUrl: 'app/templates/index.html',
+          template: instanceTemplate,
           controller: 'InstanceCtrl'
         }).
 
