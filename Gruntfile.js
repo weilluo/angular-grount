@@ -1,33 +1,71 @@
+var randomstring = require('randomstring');
+
 module.exports = function (grunt) {
   grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
-
     clean: {
-      dev: ['public', 'dist', 'tmp']
+      public: ['public'],
+      dist: ['dist']
+    },
+
+    ejs: {
+      all: {
+        options: {
+          version: "<%= version %>"
+        },
+        src: ['app/index.ejs'],
+        dest: 'public/index.html'
+      }
     },
 
     copy: {
       main: {
         files: [
-          {src: ['app/index.html'], dest: 'public/index.html'},
+          {src: ['config/main.js'], dest: 'public/assets/main.js'},
 
-          {src: ['config/config.js'], dest: 'public/assets/js/config.js'},
-          {src: ['config/main.js'], dest: 'public/assets/js/main.js'},
+          {expand: true, src: ['app/**'], dest: 'public/assets/'},
+          {src: ['bower_components/text/text.js'], dest: 'public/assets/require-text.js'}
+        ],
+      },
 
-          {expand: true, src: ['app/**'], dest: 'public/assets/js/'},
+      dev: {
+        files: [
+          {expand: true, cwd: 'bower_components/bootstrap/dist/fonts', src: ['**'], dest: 'public/assets'},
 
-          {src: ['bower_components/requirejs/require.js'], dest: 'public/assets/js/require.js'},
-          {src: ['bower_components/text/text.js'], dest: 'public/assets/js/require-text.js'},
+          {src: ['bower_components/requirejs/require.js'], dest: 'public/assets/require.js'}
+        ]
+      },
 
-          {expand: true, src: ['bower_components/bootstrap/dist/fonts/**'], dest: 'public/assets/fonts/'}
+      prod: {
+        files: [
+          {src: ['public/index.html'], dest: 'dist/index.html'},
+          {expand: true, cwd: 'bower_components/bootstrap/dist/fonts', src: ['**'], dest: 'dist/assets'},
+
+          {src: ['bower_components/requirejs/require.js'], dest: 'dist/assets/require.js'}
         ]
       }
     },
 
     uglify: {
+      options: {
+        mangle: false
+      },
       build: {
-        src: 'public/vendor.js',
-        dest: 'dist/vendor.min.js'
+        files: {
+          'dist/assets/vendor<%= version %>.js': ['public/assets/vendor.js']
+        }
+      }
+    },
+
+    cssmin: {
+      options: {
+        shorthandCompacting: false,
+        roundingPrecision: -1
+      },
+      build: {
+        files: {
+          'dist/assets/vendor<%= version %>.css': ['public/assets/vendor.css'],
+          'dist/assets/app<%= version %>.css': ['public/assets/app.css']
+        }
       }
     },
 
@@ -42,13 +80,13 @@ module.exports = function (grunt) {
           'bower_components/angular-route/angular-route.js',
           'bower_components/angular-bootstrap/ui-bootstrap-tpls.js'
         ],
-        dest: 'public/assets/js/vendor.js'
+        dest: 'public/assets/vendor.js'
       },
       css: {
         src: [
           'bower_components/bootstrap/dist/css/bootstrap.css'
         ],
-        dest: 'public/assets/css/vendor.css'
+        dest: 'public/assets/vendor.css'
       }
     },
 
@@ -56,8 +94,21 @@ module.exports = function (grunt) {
       dist: {
         options: {
           sassDir: 'app/styles',
-          cssDir: 'public/assets/css',
+          cssDir: 'public/assets',
           environment: 'development'
+        }
+      }
+    },
+
+    requirejs: {
+      compile: {
+        options: {
+          baseUrl: './public/assets',
+          mainConfigFile: 'public/assets/main.js',
+          // optimize: 'none',
+          name: '../../bower_components/almond/almond',
+          include: ['main'],
+          out: 'dist/assets/app<%= version %>.js'
         }
       }
     },
@@ -68,7 +119,7 @@ module.exports = function (grunt) {
         livereload: true
       },
       src: {
-        files: ['app/index.html', 'config/*.js', 'app/**/*.{js|html}', 'app/styles/**/*.scss'],
+        files: ['app/index.ejs', 'config/*.js', 'app/**/*.js', 'app/**/*.html', 'app/**/*.scss'],
         tasks: ['build_dev']
       },
     },
@@ -77,7 +128,7 @@ module.exports = function (grunt) {
       server: {
         options: {
           livereload: true,
-          port: 8000,
+          port: 4200,
           base: 'public'
         }
       }
@@ -87,14 +138,35 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-compass');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-contrib-requirejs');
+  grunt.loadNpmTasks('grunt-ejs');
 
-  grunt.registerTask('build_dev', ['clean:dev', 'copy', 'concat', 'compass']);
+  grunt.registerTask('gv', 'Generate a assets version.', function(env) {
+    if (env === 'dev') {
+      grunt.config.set('version', '');
+    } else if (env === 'prod') {
+      grunt.config.set('version', '-' + randomstring.generate());
+    } else {
+      throw Error('Unkown params "env" = ' + env + ' for generate version task.');
+    }
+  });
 
-  grunt.registerTask('build', []);
+  grunt.registerTask('copy_dev', 'Copy files for development.', function(env) {
+    grunt.task.run('copy:main', 'copy:dev');
+  });
+
+  grunt.registerTask('copy_prod', 'Copy files for development.', function(env) {
+    grunt.task.run('copy:main', 'copy:prod');
+  });
+
+  grunt.registerTask('build_dev', ['clean:public', 'gv:dev', 'ejs', 'copy_dev', 'concat', 'compass']);
+
+  grunt.task.registerTask('build', ['clean', 'gv:prod', 'ejs', 'copy_prod', 'concat', 'compass', 'uglify', 'cssmin', 'requirejs']);
 
   grunt.registerTask('server', ['build_dev', 'connect:server', 'watch']);
 };
