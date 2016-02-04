@@ -117,7 +117,7 @@ module.exports = function (grunt) {
       },
       src: {
         files: ['app/index.ejs', 'config/*.js', 'app/**/*.js', 'app/**/*.html', 'app/**/*.scss'],
-        tasks: ['build_dev']
+        tasks: ['build:dev']
       },
     },
 
@@ -161,9 +161,15 @@ module.exports = function (grunt) {
     grunt.task.run('copy:main', 'copy:prod');
   });
 
-  grunt.registerTask('build_dev', ['clean:public', 'gv:dev', 'ejs', 'copy_dev', 'concat', 'compass']);
+  grunt.task.registerTask('build', 'Build assets for app.', function(env) {
+    if (env === 'dev') {
+      grunt.task.run('clean:public', 'gv:dev', 'ejs', 'copy_dev', 'concat', 'compass');
+    } else if (env === 'prod') {
+      grunt.task.run('clean', 'gv:prod', 'ejs', 'copy_prod', 'concat', 'compass', 'uglify', 'cssmin', 'requirejs');
+    } else {
+      throw Error('Unkown params "env" = ' + env + ' for build assets task.');
+    }
+  });
 
-  grunt.task.registerTask('build', ['clean', 'gv:prod', 'ejs', 'copy_prod', 'concat', 'compass', 'uglify', 'cssmin', 'requirejs']);
-
-  grunt.registerTask('server', ['build_dev', 'connect:server', 'watch']);
+  grunt.registerTask('server', ['build:dev', 'connect:server', 'watch']);
 };

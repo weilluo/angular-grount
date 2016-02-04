@@ -1,0 +1,25 @@
+server {
+  server_name <%= fetch(:server_name) %>;
+  listen 80;
+
+  root <%= fetch(:shared_path) %>/www;
+
+  access_log <%= fetch(:shared_path) %>/log/nginx-access.log;
+  error_log <%= fetch(:shared_path) %>/log/nginx-error.log;
+  rewrite_log on;
+
+  location ~* ^(/assets) {
+    access_log off;
+    log_not_found off;
+    gzip_static on;
+    expires max;
+    add_header Cache-Control public;
+    break;
+  }
+
+  try_files $uri/index.html $uri /;
+
+  error_page 404 422 /500.html;
+  client_max_body_size 4G;
+  keepalive_timeout 10;
+}
