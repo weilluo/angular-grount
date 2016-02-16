@@ -1,4 +1,4 @@
-define(['text!app/templates/directives/test1.html'], function(test1Template) {
+define(['text!app/directives/test1.html'], function(test1Template) {
   return [
     function () {
       return {

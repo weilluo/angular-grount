@@ -1,6 +1,6 @@
 define([
-    'text!app/templates/instances.html',
-    'text!app/templates/instance.html'
+    'text!app/instance/instances.html',
+    'text!app/instance/instance.html'
   ],
   function(instancesTemplate, instanceTemplate) {
     return [

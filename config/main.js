@@ -14,9 +14,9 @@ require(
   [
     'app/app',
     'app/route',
-    'app/controllers/instances',
-    'app/controllers/instance',
-    'app/directives/test1'
+    'app/instance/instances-ctrl',
+    'app/instance/instance-ctrl',
+    'app/directives/test1-directive'
   ],
   function(app, routeConig, InstancesCtrl, InstanceCtrl, test1Directive) {
     app.config(routeConig),
