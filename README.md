@@ -2,16 +2,25 @@
 
 ## Usage
 
-1. make sure you had installed `node`, `ruby`, `bower`, `grunt`.
+- make sure you had installed `node`, `ruby`, `bower`, `grunt`.
 
-2. `cd root-folder`, then `npm install && bower install && bundle install`.
+- cd `root-folder`, then `npm install && bower install && bundle install`.
 
-3. to develop, `cd root-folder`, then `grunt server`.
+- to develop, cd `root-folder`, then `grunt server`.
 
-4. to deploy, `cap production deploy`.
+- acceptance test
 
-## TODO
+```bash
+node_modules/protractor/bin/webdriver-manager start
+node_modules/protractor/bin/protractor
 
-1. test with karma
+# update webdriver-manager
+node_modules/protractor/bin/webdriver-manager update --standalone
+```
 
-2. test with protractor
+- unit test (services)
+
+```bash
+npm install -g karma-cli
+karma start
+```
