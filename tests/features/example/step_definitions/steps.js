@@ -4,6 +4,6 @@ module.exports = function() {
   });
 
   this.Then(/^I should see the correct page$/, function(callback) {
-    expect(browser.getCurrentUrl()).to.eventually.contain('instances').notify(callback);
+    expect(browser.getCurrentUrl()).to.eventually.contain('instances/xxxx.1111.com').notify(callback);
   });
 };

@@ -1,4 +1,4 @@
 define([], function() {
-    return angular.module('DemoApp', ['ngRoute', 'ui.bootstrap']);
+    return angular.module('DemoApp', ['ui.router', 'ui.bootstrap']);
   }
 );
