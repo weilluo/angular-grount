@@ -1,7 +1,7 @@
 describe('demoService test example', function() {
   var $service;
 
-  beforeEach(module('DemoApp'));
+  beforeEach(module('DemoAppTest'));
 
   beforeEach(inject(function(_demo_) {
       $service = _demo_;

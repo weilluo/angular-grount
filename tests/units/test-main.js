@@ -22,10 +22,11 @@ require.config({
 
 require(
   [
-    'app/app',
     'app/services/demo'
   ],
-  function(app, demoService) {
+  function(demoService) {
+    var app = angular.module('DemoAppTest', []);
+
     app.factory('demo', demoService);
     angular.bootstrap(document, [app.name]);
   }

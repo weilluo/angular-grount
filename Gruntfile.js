@@ -3,7 +3,7 @@ var randomstring = require('randomstring');
 module.exports = function (grunt) {
   grunt.initConfig({
     clean: {
-      public: ['public'],
+      tmp: ['tmp'],
       dist: ['dist']
     },
 
@@ -13,56 +13,32 @@ module.exports = function (grunt) {
           version: "<%= version %>"
         },
         src: ['app/index.ejs'],
-        dest: 'public/index.html'
+        dest: 'tmp/index.html'
       }
     },
 
     copy: {
       main: {
         files: [
-          {src: ['config/main.js'], dest: 'public/assets/main.js'},
+          {src: ['config/main.js'], dest: 'tmp/assets/main.js'},
 
-          {expand: true, src: ['app/**'], dest: 'public/assets/'},
-          {src: ['bower_components/requirejs/require.js'], dest: 'public/assets/require.js'},
-          {src: ['bower_components/text/text.js'], dest: 'public/assets/require-text.js'}
+          {expand: true, src: ['app/**'], dest: 'tmp/assets/'},
+          {src: ['bower_components/requirejs/require.js'], dest: 'tmp/assets/require.js'},
+          {src: ['bower_components/text/text.js'], dest: 'tmp/assets/require-text.js'}
         ],
       },
 
       dev: {
         files: [
-          {expand: true, cwd: 'bower_components/bootstrap/dist/fonts', src: ['**'], dest: 'public/assets'}
+          {expand: true, flatten: true, src: ['bower_components/bootstrap/dist/fonts/**'], dest: 'tmp/assets/fonts', filter: 'isFile'}
         ]
       },
 
       prod: {
         files: [
-          {src: ['public/index.html'], dest: 'dist/index.html'},
-          {expand: true, cwd: 'bower_components/bootstrap/dist/fonts', src: ['**'], dest: 'dist/assets'}
+          {src: ['tmp/index.html'], dest: 'dist/index.html'},
+          {expand: true, flatten: true, src: ['bower_components/bootstrap/dist/fonts/**'], dest: 'dist/assets/fonts', filter: 'isFile'}
         ]
-      }
-    },
-
-    uglify: {
-      options: {
-        mangle: false
-      },
-      build: {
-        files: {
-          'dist/assets/vendor<%= version %>.js': ['public/assets/vendor.js']
-        }
-      }
-    },
-
-    cssmin: {
-      options: {
-        shorthandCompacting: false,
-        roundingPrecision: -1
-      },
-      build: {
-        files: {
-          'dist/assets/vendor<%= version %>.css': ['public/assets/vendor.css'],
-          'dist/assets/app<%= version %>.css': ['public/assets/app.css']
-        }
       }
     },
 
@@ -76,22 +52,44 @@ module.exports = function (grunt) {
           'bower_components/angular-ui-router/release/angular-ui-router.js',
           'bower_components/angular-bootstrap/ui-bootstrap-tpls.js'
         ],
-        dest: 'public/assets/vendor.js'
+        dest: 'tmp/assets/vendor.js'
       },
       css: {
         src: [
           'bower_components/bootstrap/dist/css/bootstrap.css'
         ],
-        dest: 'public/assets/vendor.css'
+        dest: 'tmp/assets/vendor.css'
       }
     },
 
-    compass: {
+    less: {
       dist: {
-        options: {
-          sassDir: 'app/styles',
-          cssDir: 'public/assets',
-          environment: 'development'
+        files: {
+          'tmp/assets/app.css': 'app/styles/app.less'
+        }
+      }
+    },
+
+    uglify: {
+      options: {
+        mangle: false
+      },
+      build: {
+        files: {
+          'dist/assets/vendor<%= version %>.js': ['tmp/assets/vendor.js']
+        }
+      }
+    },
+
+    cssmin: {
+      options: {
+        shorthandCompacting: false,
+        roundingPrecision: -1
+      },
+      build: {
+        files: {
+          'dist/assets/vendor<%= version %>.css': ['tmp/assets/vendor.css'],
+          'dist/assets/app<%= version %>.css': ['tmp/assets/app.css']
         }
       }
     },
@@ -99,8 +97,8 @@ module.exports = function (grunt) {
     requirejs: {
       compile: {
         options: {
-          baseUrl: './public/assets',
-          mainConfigFile: 'public/assets/main.js',
+          baseUrl: './tmp/assets',
+          mainConfigFile: 'tmp/assets/main.js',
           // optimize: 'none',
           name: '../../bower_components/almond/almond',
           include: ['main'],
@@ -125,7 +123,7 @@ module.exports = function (grunt) {
         options: {
           livereload: true,
           port: 4200,
-          base: 'public'
+          base: 'tmp'
         }
       }
     }
@@ -136,7 +134,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-compass');
+  grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-requirejs');
@@ -162,9 +160,9 @@ module.exports = function (grunt) {
 
   grunt.task.registerTask('build', 'Build assets for app.', function(env) {
     if (env === 'dev') {
-      grunt.task.run('clean:public', 'gv:dev', 'ejs', 'copy_dev', 'concat', 'compass');
+      grunt.task.run('clean:tmp', 'gv:dev', 'ejs', 'copy_dev', 'concat', 'less');
     } else if (env === 'prod') {
-      grunt.task.run('clean', 'gv:prod', 'ejs', 'copy_prod', 'concat', 'compass', 'uglify', 'cssmin', 'requirejs');
+      grunt.task.run('clean', 'gv:prod', 'ejs', 'copy_prod', 'concat', 'less', 'uglify', 'cssmin', 'requirejs');
     } else {
       throw Error('Unkown params "env" = ' + env + ' for build assets task.');
     }
