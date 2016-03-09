@@ -43,9 +43,6 @@ module.exports = function (grunt) {
     },
 
     concat: {
-      options: {
-        separator: ';'
-      },
       js: {
         src: [
           'bower_components/angular/angular.js',
