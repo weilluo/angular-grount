@@ -11,6 +11,7 @@ define([
       function($stateProvider, $urlRouterProvider) {
         // For any unmatched url, redirect to /
         $urlRouterProvider.otherwise('/');
+        $urlRouterProvider.when('', '/');
 
         $stateProvider
           .state('application', {

@@ -4,7 +4,7 @@ exports.config = {
   exclude: [],
   mocks: {
     default: [],
-    dir: 'tests/features/mock_data'
+    dir: 'tests/mock_data'
   },
   framework: 'custom',
   frameworkPath: require.resolve('protractor-cucumber-framework'),
