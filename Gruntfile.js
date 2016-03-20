@@ -110,7 +110,7 @@ module.exports = function (grunt) {
         livereload: true
       },
       src: {
-        files: ['app/index.ejs', 'config/*.js', 'app/**/*.js', 'app/**/*.html', 'app/**/*.scss'],
+        files: ['app/index.ejs', 'config/*.js', 'app/**/*.js', 'app/**/*.html', 'app/**/*.less'],
         tasks: ['build:dev']
       },
     },
